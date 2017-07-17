@@ -107,19 +107,29 @@ class OnlineLDA:
         set kappa=0 this class can also be used to do batch VB.
         """
         self._vocab = dict()
-        for word in vocab:
-            word = word.lower()
-            word = re.sub(r'[^a-z]', '', word)
-            self._vocab[word] = len(self._vocab)
 
         self._K = K
-        self._W = len(self._vocab) + 1
         self._D = D
         self._alpha = alpha
         self._eta = eta
         self._tau0 = tau0 + 1
         self._kappa = kappa
         self._updatect = 0
+
+        self.merge_vocab([vocab])
+
+    def merge_vocab(self, docs):
+        """
+        Add the given docs to the vocabolary
+        """
+        for doc in docs:
+            for word in str(doc).split():
+                word = word.lower()
+                word = re.sub(r'[^a-z]', '', word)
+                if word not in self._vocab:
+                    self._vocab[word] = len(self._vocab)
+
+        self._W = len(self._vocab) + 1
 
         # Initialize the variational distribution q(beta|lambda)
         # K x W
